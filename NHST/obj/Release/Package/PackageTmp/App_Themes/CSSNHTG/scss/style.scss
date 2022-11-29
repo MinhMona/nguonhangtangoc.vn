@@ -1,0 +1,56 @@
+@import url("../js/libs/wow/animate.min.css");
+@import url("../js/libs/swiper/swiper-bundle.min.css");
+@import url("../fonts/SFUIText/font.css");
+@import url("../fonts/font-awesome-4.6.3/css/all.min.css");
+@import url(../fonts/fontawesome/css/all.css);
+@import url("../js/libs/slick/slick-theme.css");
+@import url("../js/libs/slick/slick.css");
+
+
+@import "components/_reset.scss";
+@import "components/_nguonhangsieutoc.scss";
+@import 'components/_popup.scss';
+@import "components/_cfacebook.scss";
+@import "components/vominhthien.scss";
+@import "components/namtrung.scss";
+@import "components/nguonhangtangoc";
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: black;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(232, 69, 69);
+}
+
+.hd-sticky #header {
+  overflow: hidden;
+  transition: all 0.3s;
+  height: 145px;
+}
+
+.hd-sticky #header.hidden {
+  height: 0;
+}
+
+.hd-sticky #main-nav {
+  transition: all 0.3s ease-in-out;
+}
+
+.hd-sticky #header.hidden ~ #main-nav {
+  top: 10px;
+  filter: drop-shadow(0 20px 20px #00000036);
+}
