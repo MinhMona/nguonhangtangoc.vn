@@ -246,6 +246,7 @@
     <EntitySetMapping Name="tbl_Complain">
       <EntityTypeMapping TypeName="NHSTModel.tbl_Complain">
         <MappingFragment StoreEntitySet="tbl_Complain">
+          <ScalarProperty Name="DathangID" ColumnName="DathangID" />
           <ScalarProperty Name="AdminStatus" ColumnName="AdminStatus" />
           <ScalarProperty Name="TypeComplain" ColumnName="TypeComplain" />
           <ScalarProperty Name="OrderShopCode" ColumnName="OrderShopCode" />

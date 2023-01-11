@@ -97,6 +97,7 @@ namespace NHST
 
                 ltrAddressCt.Text = "<a>" + confi.Address + "</a>";
                 ltrAddressKhoMN.Text = "<a>" + confi.Address2 + "</a>";
+                ltrAddressKhoMN2.Text = "<a>" + confi.Address2 + "</a>";
                 ltrHotlineCt.Text += "<a href=\"tel:" + confi.Hotline + "\">" + confi.Hotline + "</a>";
                 ltrHotlineCt2.Text += "<a href=\"tel:" + confi.HotlineSupport + "\">" + confi.HotlineSupport + "</a>";
                 ltrHotlineKhoHN.Text += "<a href=\"tel:" + confi.HotlineFeedback + "\">" + confi.HotlineFeedback + "</a>";

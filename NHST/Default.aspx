@@ -167,6 +167,11 @@
                                     aria-hidden="true"></i>Địa chỉ:
                                 <asp:Literal runat="server" ID="ltrAddressKhoMN"></asp:Literal>
                             </div>
+                            <div class="dt-info" data-wow-delay="0.8s">
+                                <i class="fas fa-fw fa-mobile-alt"
+                                    aria-hidden="true"></i>Địa chỉ 2:
+                                <asp:Literal runat="server" ID="ltrAddressKhoMN2"></asp:Literal>
+                            </div>
                         </div>
                     </div>
                 </div>

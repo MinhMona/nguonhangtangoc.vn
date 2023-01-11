@@ -249,6 +249,7 @@
     <Property Name="OrderShopCode" Type="nvarchar(max)" />
     <Property Name="TypeComplain" Type="int" />
     <Property Name="AdminStatus" Type="int" />
+    <Property Name="DathangID" Type="int" />
   </EntityType>
   <EntityType Name="tbl_Configuration">
     <Key>

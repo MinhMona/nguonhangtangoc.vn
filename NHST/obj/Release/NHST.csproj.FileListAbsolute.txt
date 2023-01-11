@@ -2030,3 +2030,12 @@ D:\Mona\nguonhangtangoc.vn\NHST\obj\Release\NHST.csproj.CoreCompileInputs.cache
 D:\Mona\nguonhangtangoc.vn\NHST\obj\Release\NHST.csproj.CopyComplete
 D:\Mona\nguonhangtangoc.vn\NHST\obj\Release\NHST.dll
 D:\Mona\nguonhangtangoc.vn\NHST\obj\Release\NHST.pdb
+D:\Mona\nguonhangtangoc.vn\NHST\bin\EPPlus.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\EPPlus.Interfaces.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\EPPlus.System.Drawing.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\Microsoft.IO.RecyclableMemoryStream.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\EPPlus.xml
+D:\Mona\nguonhangtangoc.vn\NHST\bin\Microsoft.IO.RecyclableMemoryStream.xml
+D:\Mona\nguonhangtangoc.vn\NHST\bin\ClosedXML.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\DocumentFormat.OpenXml.dll
+D:\Mona\nguonhangtangoc.vn\NHST\bin\ClosedXML.xml

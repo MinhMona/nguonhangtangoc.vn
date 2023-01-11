@@ -1903,6 +1903,7 @@ namespace NHST.Controllers
         #endregion
 
         #region GetAll
+
         public static List<View_OrderListFilterWithStatusString> GetByUserInViewFilterWithStatusString(int RoleID, int OrderType, int StaffID,
             string searchtext, int Type)
         {

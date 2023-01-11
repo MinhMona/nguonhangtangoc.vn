@@ -920,9 +920,9 @@ namespace NHST.Bussiness
                 return "<span class=\"bg-orange\">Đã về kho TQ</span>";
             else if (status == 3)
                 return "<span class=\"bg-green\">Đã về kho đích</span>";
-            else if(status == 5)
+            else if (status == 5)
                 return "<span class=\"bg-blue\">Đang về kho đích</span>";
-            else if(status == 4)
+            else if (status == 4)
                 return "<span class=\"bg-blue\">Đã thanh toán</span>";
             else
                 return "<span class=\"bg-blue\">Đang giao cho khách</span>";
@@ -941,7 +941,7 @@ namespace NHST.Bussiness
                 return "<span class=\"bg-blue\">Đang về kho đích</span>";
             else if (status == 4)
                 return "<span class=\"bg-blue\">Đã thanh toán</span>";
-            else 
+            else
                 return "<span class=\"bg-blue\">Đang  giao cho khách</span>";
         }
         public static string ShowPhoneByUID(int ID)
@@ -1303,6 +1303,10 @@ namespace NHST.Bussiness
             {
                 return "<span class='badge blue darken-2 white-text border-radius-2'>Đã xử lý</span>";
             }
+            else if (status == 4)
+            {
+                return "<span class='badge green darken-2 white-text border-radius-2'>Admin đang xử lý</span>";
+            }
             else
             {
                 return "<span class='badge orange darken-2 white-text border-radius-2'>Đã hủy</span>";
@@ -1471,7 +1475,7 @@ namespace NHST.Bussiness
         {
             if (Status == 0)
                 return "<span class=\"badge black darken-2 white-text border-radius-2\">Đã hủy</span>";
-            else if(Status == 1)
+            else if (Status == 1)
                 return "<span class=\"badge red darken-2 white-text border-radius-2\">Khiếu nại mới</span>";
             else if (Status == 2)
                 return "<span class=\"badge yellow darken-2 white-text border-radius-2\">Đang xử lý</span>";
@@ -1486,7 +1490,7 @@ namespace NHST.Bussiness
             if (Status == 1)
                 return "<span class=\"badge red darken-2 white-text border-radius-2\">Chưa xử lý</span>";
             else
-                return "<span class=\"badge blue darken-2 white-text border-radius-2\">Đã xử lý</span>";            
+                return "<span class=\"badge blue darken-2 white-text border-radius-2\">Đã xử lý</span>";
         }
 
         public static string ReturnTypeCompalint(int Status)
@@ -1510,7 +1514,7 @@ namespace NHST.Bussiness
             if (Status == 1)
                 return "<span class=\"badge green darken-2 white-text border-radius-2\">Đang hoạt động</span>";
             else if (Status == 2)
-                return "<span class=\"badge blue darken-2 white-text border-radius-2\">Đã kết thúc</span>";           
+                return "<span class=\"badge blue darken-2 white-text border-radius-2\">Đã kết thúc</span>";
             else
                 return "<span>Không xác định</span>";
         }
@@ -1741,6 +1745,60 @@ namespace NHST.Bussiness
             else
                 return "<span class=\"white-text badge blue darken-2\">Đang giao cho khách</span>";
         }
+        public static string IntToStringStatusSmallPackageString(int status)
+        {
+            switch (status)
+            {
+                case 0:
+                    return "Đã hủy";
+                case 1:
+                    return "Chưa về kho TQ";
+                case 2:
+                    return "Đã về kho TQ";
+                case 3:
+                    return "Đã về kho đích";
+                case 4:
+                    return "Đã thanh toán";
+                case 5:
+                    return "Đang về kho đích";
+                case 6:
+                    return "Đã giao khách hàng";
+                default:
+                    return "Đã hủy";
+            }
+        }
+        public static string IntToStringStatusMainOrderString(int status)
+        {
+            switch (status)
+            {
+                case 0:
+                    return "Đơn mới";
+                case 1:
+                    return "Đơn hàng hủy";
+                case 2:
+                    return "Đơn đã cọc";
+                case 3:
+                    return "Đơn người bán giao";
+                case 4:
+                    return "Đơn chờ mua hàng";
+                case 5:
+                    return "Đơn đã mua hàng";
+                case 6:
+                    return "Kho Trung Quốc nhận hàng";
+                case 7:
+                    return "Trên đường về Việt Nam";
+                case 8:
+                    return "Trong kho Hà Nội";
+                case 9:
+                    return "Đã thanh toán";
+                case 10:
+                    return "Đã hoàn thành";
+                case 11:
+                    return "Đang giao hàng";
+                default:
+                    return "Đơn khiếu nại";
+            }
+        }
 
         public static string IntToStringStatusSmallPackageWithBG45(int status)
         {
@@ -1802,7 +1860,7 @@ namespace NHST.Bussiness
             else if (ID == 100)
             {
                 return "Trực tiếp tại văn phòng";
-            }            
+            }
             else
             {
                 return "Trực tiếp tại văn phòng";

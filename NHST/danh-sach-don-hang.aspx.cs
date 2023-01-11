@@ -5,6 +5,9 @@ using NHST.Controllers;
 using NHST.Hubs;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +16,11 @@ using System.Web.Script.Serialization;
 using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using static NHST.WebService1;
+using Telerik.Charting;
+using static NHST.Controllers.SmallPackageController;
+using Telerik.Web.UI.GridExcelBuilder;
+using ClosedXML.Excel;
 
 namespace NHST
 {
@@ -644,6 +652,8 @@ namespace NHST
                         html.Append("<td>");
                         html.Append("<div class=\"action-table\">");
 
+                        html.Append("    <a href=\"javascript:;\" onclick=\"exportStatistic('" + item.ID + "', $(this))\" data-position=\"top\"><i class=\"material-icons\">launch</i><span>Xuất thống kê</span></a>");
+                        //html.Append("    <a href=\"javascript:;\" id=\"btnExportStatistic\" data-position=\"top\"><i class=\"material-icons\">attach_money</i><span>Xuất thống kê</span></a>");
                         html.Append("     <a href=\"/chi-tiet-don-hang/" + item.ID + "\" data-position=\"top\" ><i class=\"material-icons\">remove_red_eye</i><span>Chi tiết</span></a>");
                         if (item.Status == 9 || item.Status == 10)
                         {
@@ -1542,7 +1552,7 @@ namespace NHST
         }
 
         protected void btnRemoveOrder_Click(object sender, EventArgs e)
-        {         
+        {
             string username_current = Session["userLoginSystem"].ToString();
             var obj_user = AccountController.GetByUsername(username_current);
             if (obj_user != null)
@@ -1553,7 +1563,7 @@ namespace NHST
                     int UID = obj_user.ID;
                     var mo = MainOrderController.GetAllByUIDAndID(UID, OID);
                     if (mo != null)
-                    {                        
+                    {
                         var kq = MainOrderController.Delete(OID);
                         if (kq != null)
                         {
@@ -3207,8 +3217,420 @@ namespace NHST
             }
         }
 
+        protected void btnExcelStatistic_Click(object sender, EventArgs e)
+        {
+            int OID = hdfOrderID.Value.ToInt();
+            var mainOrder = MainOrderController.GetByID(OID);
+            var orders = OrderController.GetByMainOrderID(OID);
+            var smallPackages = SmallPackageController.GetByMainOrderID(OID);
+            double pricePerWeight = 0;
 
+            StringBuilder StrExport = new StringBuilder();
+            StrExport.Append(@"<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40'><head><title>Time</title>");
+            StrExport.Append(@"<body lang=EN-US style='mso-element:header' id=h1><span style='mso--code:DATE'></span><div class=Section1>");
+            StrExport.Append("<DIV  style='font-size:12px;'>");
+            StrExport.Append("<table border=\"1\">");
 
+            if (mainOrder != null)
+            {
+                StrExport.Append("  <tr>");
+                StrExport.Append($"      <td>Chi tiết đơn hàng</td>");
+                StrExport.Append($"      <td>{mainOrder.ID}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
 
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Trạng thái</td>");
+                StrExport.Append($"<td>{PJUtils.IntToStringStatusMainOrderString(mainOrder.Status ?? 0)}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Tỷ giá</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.CurrentCNYVN))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Tiền hàng</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.PriceVND))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Phí mua hàng</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.FeeBuyPro))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Phí cân nặng</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.FeeWeight))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Ship Trung Quốc</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.FeeShipCN))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Phí đóng gỗ</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.IsPackedPrice))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Phí đặc biệt</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.IsCheckPriceSpecial))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Tổng tiền đơn hàng</td>");
+                StrExport.Append($"<td>{string.Format("{0:N0}", Convert.ToDouble(mainOrder.TotalPriceVND))}</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                StrExport.Append("  <tr>");
+                StrExport.Append("<td>Các kiện hàng</td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append($"      <td></td>");
+                StrExport.Append("  </tr>");
+
+                var usercreate = AccountController.GetByID(mainOrder.UID ?? 0);
+                if (!string.IsNullOrEmpty(usercreate.FeeTQVNPerWeight))
+                {
+                    double feetqvn = 0;
+                    if (usercreate.FeeTQVNPerWeight.ToFloat(0) > 0)
+                    {
+                        feetqvn = Convert.ToDouble(usercreate.FeeTQVNPerWeight);
+                        pricePerWeight = feetqvn;
+                    }
+                }
+                else
+                {
+
+                    var fee = WarehouseFeeController.GetByAndWarehouseFromAndToWarehouseAndShippingTypeAndAndHelpMoving((mainOrder.FromPlace ?? 0), (Convert.ToInt32(mainOrder.ReceivePlace)), (mainOrder.ShippingType ?? 0), false);
+                    if (fee.Count > 0)
+                    {
+                        foreach (var f in fee)
+                        {
+                            if (Convert.ToDouble(mainOrder.PriceVND) > f.WeightFrom && Convert.ToDouble(mainOrder.PriceVND) <= f.WeightTo)
+                            {
+                                pricePerWeight = Convert.ToDouble(f.Price);
+                            }
+                        }
+                    }
+                }
+            }
+            StrExport.Append("  <tr>");
+            StrExport.Append($"      <th>STT</th>");
+            StrExport.Append($"      <th>Mã kiện</th>");
+            StrExport.Append("       <th style=\"width=100px\">Mã vận đơn</th>");
+            StrExport.Append($"      <th>Trạng thái</th>");
+            StrExport.Append($"      <th>Cân nặng</th>");
+            StrExport.Append($"      <th>Cân quy đổi</th>");
+            StrExport.Append($"      <th>Cân tính tiền</th>");
+            StrExport.Append($"      <th>Đơn giá</th>");
+            StrExport.Append($"      <th></th>");
+            StrExport.Append("  </tr>");
+            if (smallPackages != null)
+            {
+                int stt = 0;
+                foreach (var smallPackage in smallPackages)
+                {
+                    stt++;
+                    double weightChange = 0;
+                    if (smallPackage.Length > 0 && smallPackage.Width > 0 && smallPackage.Height > 0)
+                    {
+                        weightChange = Math.Round((smallPackage.Length.Value * smallPackage.Width.Value * smallPackage.Height.Value) / 6000, 5);
+                    }
+
+                    double payableWeight = 0;
+                    payableWeight = smallPackage.Weight.Value > weightChange ? smallPackage.Weight.Value : weightChange;
+                    StrExport.Append("  <tr>");
+                    StrExport.Append($"<td>{stt}</td>");
+                    StrExport.Append($"<td>{smallPackage.ID}</td>");
+                    StrExport.Append("<td style=\"mso-number-format:'\\@'\">" + smallPackage.OrderTransactionCode + "</td>");
+                    StrExport.Append($"<td>{PJUtils.IntToStringStatusSmallPackageString(smallPackage.Status ?? 0)}</td>");
+                    StrExport.Append($"<td>{smallPackage.Weight}</td>");
+                    StrExport.Append($"<td>{weightChange}</td>");
+                    StrExport.Append($"<td>{payableWeight}</td>");
+                    StrExport.Append($"<td>{string.Format("{0:N0}", pricePerWeight)}</td>");
+                    StrExport.Append($"      <td></td>");
+                    StrExport.Append("  </tr>");
+                }
+            }
+            StrExport.Append("  <tr>");
+            StrExport.Append($"      <th>STT</th>");
+            StrExport.Append("       <th>Mã link</th>");
+            StrExport.Append($"      <th>Thuộc tính</th>");
+            StrExport.Append($"      <th>Số lượng</th>");
+            StrExport.Append($"      <th>Giá </th>");
+            StrExport.Append($"      <th>Thành tiền (tệ)</th>");
+            StrExport.Append($"      <th>Thành tiền (VND)</th>");
+            StrExport.Append($"      <th>Trạng thái</th>");
+            StrExport.Append($"      <th style=\"width=100px\">Link</th>");
+            StrExport.Append("  </tr>");
+            if (orders != null)
+            {
+                int stt = 0;
+                foreach (var order in orders)
+                {
+                    string status = "Còn hàng";
+                    if (order.ProductStatus != null && order.ProductStatus == 2)
+                        status = "Hết hàng";
+                    stt++;
+                    double price = 0;
+                    double pricepromotion = 0;
+                    double priceorigin = 0;
+                    if (order.price_promotion.ToFloat(0) > 0)
+                        pricepromotion = Convert.ToDouble(order.price_promotion);
+                    if (order.price_origin.ToFloat(0) > 0)
+                        priceorigin = Convert.ToDouble(order.price_origin);
+                    if (pricepromotion > 0)
+                    {
+                        if (priceorigin > pricepromotion)
+                        {
+                            price = pricepromotion;
+                        }
+                        else
+                        {
+                            price = priceorigin;
+                        }
+                    }
+                    else
+                    {
+                        price = priceorigin;
+                    }
+                    StrExport.Append("  <tr>");
+                    StrExport.Append($"<td>{stt}</td>");
+                    StrExport.Append($"<td>{order.ID}</td>");
+                    StrExport.Append($"<td>{order.property}</td>");
+                    StrExport.Append($"<td>{order.quantity}</td>");
+                    StrExport.Append($"<td>{price.ToString()}</td>");
+                    StrExport.Append($"<td>{Convert.ToDouble(price) * Convert.ToDouble(order.quantity)}</td>");
+                    StrExport.Append($"<td>{string.Format("{0:N0}", price * Convert.ToDouble(mainOrder.CurrentCNYVN) * Convert.ToDouble(order.quantity))}</td>");
+                    StrExport.Append($"<td>{status}</td>");
+                    StrExport.Append($"<td >{order.link_origin}</td>");
+                    StrExport.Append("  </tr>");
+                }
+            }
+            StrExport.Append("</table>");
+            StrExport.Append("</div></body></html>");
+            string strFile = $"chitietdonhang_{OID}.xls";
+            string strcontentType = "application/vnd.ms-excel";
+            Response.ClearContent();
+            Response.ClearHeaders();
+            Response.BufferOutput = true;
+            Response.ContentType = strcontentType;
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + strFile);
+            // Style is added dynamically
+            Response.Write(StrExport.ToString());
+            Response.Flush();
+            //Response.Close();
+            Response.End();
+        }
+        //protected void btnExcelStatistic_Click(object sender, EventArgs e)
+        //{
+        //    string getTemplateFilePath = HttpContext.Current.Server.MapPath("/Uploads/Excels/chitietdon.xls");
+        //    string getTemplateFilePath2 = HttpContext.Current.Server.MapPath("/Uploads/Excels/");
+        //    int OID = hdfOrderID.Value.ToInt();
+        //    var mainOrder = MainOrderController.GetByID(OID);
+        //    var orders = OrderController.GetByMainOrderID(OID);
+        //    var smallPackages = SmallPackageController.GetByMainOrderID(OID);
+        //    var ds = new DataSet();
+        //    double pricePerWeight = 0;
+
+        //    if (mainOrder != null)
+        //    {
+        //        var mainOrderTable = new DataTable();
+        //        mainOrderTable.Columns.Add("id", typeof(int));
+        //        mainOrderTable.Columns.Add("currency", typeof(double));
+        //        mainOrderTable.Columns.Add("shipTQ", typeof(double));
+        //        mainOrderTable.Columns.Add("packedPrice", typeof(double));
+        //        mainOrderTable.Columns.Add("fee", typeof(double));
+        //        mainOrderTable.Rows.Add(mainOrder.ID,
+        //            Convert.ToDouble(mainOrder.CurrentCNYVN),
+        //            Convert.ToDouble(mainOrder.FeeShipCNReal),
+        //            Convert.ToDouble(mainOrder.IsPackedPrice),
+        //            Convert.ToDouble(mainOrder.IsCheckPriceSpecial));
+        //        mainOrderTable.TableName = "mainOrderTables";
+        //        ds.Tables.Add(mainOrderTable);
+
+        //        var usercreate = AccountController.GetByID(mainOrder.UID ?? 0);
+        //        if (!string.IsNullOrEmpty(usercreate.FeeTQVNPerWeight))
+        //        {
+        //            double feetqvn = 0;
+        //            if (usercreate.FeeTQVNPerWeight.ToFloat(0) > 0)
+        //            {
+        //                feetqvn = Convert.ToDouble(usercreate.FeeTQVNPerWeight);
+        //                pricePerWeight = feetqvn;
+        //            }
+        //        }
+        //        else
+        //        {
+
+        //            var fee = WarehouseFeeController.GetByAndWarehouseFromAndToWarehouseAndShippingTypeAndAndHelpMoving((mainOrder.FromPlace ?? 0), (Convert.ToInt32(mainOrder.ReceivePlace)), (mainOrder.ShippingType ?? 0), false);
+        //            if (fee.Count > 0)
+        //            {
+        //                foreach (var f in fee)
+        //                {
+        //                    if (Convert.ToDouble(mainOrder.PriceVND) > f.WeightFrom && Convert.ToDouble(mainOrder.PriceVND) <= f.WeightTo)
+        //                    {
+        //                        pricePerWeight = Convert.ToDouble(f.Price);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    if (smallPackages != null)
+        //    {
+        //        var smallPackageTable = new DataTable();
+        //        smallPackageTable.Columns.Add("id", typeof(int));
+        //        smallPackageTable.Columns.Add("ordertransactioncode", typeof(string));
+        //        smallPackageTable.Columns.Add("status", typeof(string));
+        //        smallPackageTable.Columns.Add("weight", typeof(double));
+        //        smallPackageTable.Columns.Add("weightChange", typeof(double));
+        //        smallPackageTable.Columns.Add("payableWeight", typeof(double));
+        //        smallPackageTable.Columns.Add("feeWeightPerkg", typeof(double));
+
+        //        foreach (var smallPackage in smallPackages)
+        //        {
+        //            double weightChange = 0;
+        //            if (smallPackage.Length > 0 && smallPackage.Width > 0 && smallPackage.Height > 0)
+        //            {
+        //                weightChange = Math.Round((smallPackage.Length.Value * smallPackage.Width.Value * smallPackage.Height.Value) / 6000, 5);
+        //            }
+
+        //            double payableWeight = 0;
+        //            payableWeight = smallPackage.Weight.Value > weightChange ? smallPackage.Weight.Value : weightChange;
+
+        //            smallPackageTable.Rows.Add
+        //                (
+        //                    smallPackage.ID,
+        //                    smallPackage.OrderTransactionCode,
+        //                    PJUtils.IntToStringStatusSmallPackageString(smallPackage.Status ?? 0),
+        //                    smallPackage.Weight,
+        //                    weightChange,
+        //                    payableWeight,
+        //                    pricePerWeight
+        //                );
+        //        }
+
+        //        smallPackageTable.TableName = "smallPackageTables";
+        //        ds.Tables.Add(smallPackageTable);
+
+        //    }
+
+        //    if (orders != null)
+        //    {
+        //        var orderTable = new DataTable();
+        //        orderTable.Columns.Add("stt", typeof(int));
+        //        orderTable.Columns.Add("linkid", typeof(int));
+        //        orderTable.Columns.Add("properties", typeof(string));
+        //        orderTable.Columns.Add("size", typeof(string));
+        //        orderTable.Columns.Add("quantity", typeof(double));
+        //        orderTable.Columns.Add("price", typeof(double));
+        //        orderTable.Columns.Add("totalprice", typeof(double));
+        //        orderTable.Columns.Add("status", typeof(string));
+        //        orderTable.Columns.Add("link", typeof(string));
+        //        int stt = 0;
+        //        foreach (var order in orders)
+        //        {
+        //            string status = "Còn hàng";
+        //            if (order.ProductStatus != null && order.ProductStatus == 2)
+        //                status = "Hết hàng";
+        //            stt++;
+        //            orderTable.Rows.Add
+        //                (
+        //                    stt,
+        //                    order.ID,
+        //                    order.property,
+        //                    null,
+        //                    order.quantity,
+        //                    (Convert.ToDouble(order.price_promotion) * (Convert.ToDouble(order.CurrentCNYVN))),
+        //                    order.TotalPriceVND,
+        //                    status,
+        //                    order.link_origin
+        //                );
+        //        }
+        //        orderTable.TableName = "orderTables";
+        //        ds.Tables.Add(orderTable);
+
+        //    }
+        //    TemplateExcel.FillReport(getTemplateFilePath2 + "chitietdonhang.xls", getTemplateFilePath, ds, new string[] { "{", "}" });
+        //    Process.Start(getTemplateFilePath2 + "chitietdonhang.xls");
+        //    PJUtils.ShowMessageBoxSwAlert("Xuất thống kê đơn hàng thành công", "s", true, Page);
+        //}
     }
+
+
 }
